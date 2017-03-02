@@ -16,5 +16,11 @@ namespace SqlToMongodb
         {
             InitializeComponent();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            clsSqlToMongo csm = new clsSqlToMongo();
+            textBox2.Text = csm.commandConvertor(textBox1.Text);
+        }
     }
 }

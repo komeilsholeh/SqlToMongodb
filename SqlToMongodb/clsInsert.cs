@@ -41,7 +41,11 @@ namespace SqlToMongodb
                 i++;
             }
 
-            if (fields.Substring(0).Equals('(') && fields.Substring(fields.Length - 1).Equals(')'))
+            string s = fields.Substring(0,1);
+            string s1 = fields.Substring(fields.Length - 1);
+
+
+            if (fields.Substring(0,1).Equals("(") && fields.Substring(fields.Length - 1).Equals(")"))
             {
                 fields = fields.Substring(1, fields.Length - 2);
             }

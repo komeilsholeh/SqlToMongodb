@@ -41,7 +41,8 @@ namespace SqlToMongodb
                     break;
                 case "insert":
                     clsInsert ci = new clsInsert();
-                    ci.
+                    mongoCommand = ci.getJsonCommand(SQLcommand);
+                    
                     break;
                 case "update":
 
@@ -50,7 +51,8 @@ namespace SqlToMongodb
                     break;
                 default:
                     break;
-            } 
+            }
+            return mongoCommand; 
         }
 
 
