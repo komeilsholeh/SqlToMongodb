@@ -8,7 +8,20 @@ namespace SqlToMongodb
 {
     class clsInsert
     {
- 
+        public string getJsonCommand(string InsertCommand)
+        {
+            string command = "";
+            string[] fields= getFields(InsertCommand);
+            for(int i=0; i>fields.Length; i++)
+            {
+                command += fields[i] + "/";
+            }
+          
+
+
+
+            return command;
+        }
         private string getCollectionName(string InsertCommand)
         {
             string[] command = InsertCommand.Split(' ');
