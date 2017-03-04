@@ -12,9 +12,9 @@ namespace SqlToMongodb
         {
             string command = "";
             string[] fields= getFields(InsertCommand);
-            for(int i=0; i>fields.Length; i++)
+            for(int i=0; i<fields.Length; i++)
             {
-                command += fields[i] + "/";
+                command = command + fields[i] + "/";
             }
           
 
