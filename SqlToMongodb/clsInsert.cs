@@ -10,39 +10,37 @@ namespace SqlToMongodb
     {
         public string getJsonCommand(string InsertCommand)
         {
-            string command = "";
-            string[] fields= getFields(InsertCommand);
-            for(int i=0; i<fields.Length; i++)
-            {
-                command = command + fields[i] + "/";
-            }
+            string command = getCollectionName(InsertCommand);
+            //string[] fields= getFields(InsertCommand);
+            //for(int i=0; i<fields.Length; i++)
+            //{
+            //    command = command + fields[i] + "/";
+            //}
           
-
-
-
             return command;
         }
         private string getCollectionName(string InsertCommand)
         {
-            string[] command = InsertCommand.Split(' ');
-            return command[2];
+             return InsertCommand.Substring(11, InsertCommand.IndexOf("(")-11).Trim();
         }
 
         private string[] getFields(string InsertCommand)
         {
-            string[] command = InsertCommand.Split(' ');
-            
-            int i = 3;
-            string fields = "";
 
+            int start = InsertCommand.IndexOf("(")+1;
+            int end = InsertCommand.IndexOf(")");
+
+            for(; start< end; start++)
+            {
+                
+            }
+            string fields = "";
+            int j = InsertCommand.ToLower().IndexOf("(");
             while (!command[i].ToLower().Equals("values"))
             {
                 fields = fields + command[i].Trim();
                 i++;
             }
-
-            string s = fields.Substring(0,1);
-            string s1 = fields.Substring(fields.Length - 1);
 
 
             if (fields.Substring(0,1).Equals("(") && fields.Substring(fields.Length - 1).Equals(")"))
