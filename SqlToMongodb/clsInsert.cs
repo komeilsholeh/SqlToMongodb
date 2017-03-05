@@ -10,13 +10,13 @@ namespace SqlToMongodb
     {
         public string getJsonCommand(string InsertCommand)
         {
-            string command = getCollectionName(InsertCommand);
-            //string[] fields= getFields(InsertCommand);
-            //for(int i=0; i<fields.Length; i++)
-            //{
-            //    command = command + fields[i] + "/";
-            //}
-          
+            string command = "";
+            string[] fields = getFields(InsertCommand);
+            for (int i = 0; i < fields.Length; i++)
+            {
+                command = command + fields[i] + "/";
+            }
+
             return command;
         }
         private string getCollectionName(string InsertCommand)
@@ -26,29 +26,28 @@ namespace SqlToMongodb
 
         private string[] getFields(string InsertCommand)
         {
-
-            int start = InsertCommand.IndexOf("(")+1;
+            int start = InsertCommand.IndexOf("(") + 1;
             int end = InsertCommand.IndexOf(")");
-
-            for(; start< end; start++)
+            string fieldsStr = InsertCommand.Substring(start,end-start);
+            
+            char[] seperator =[',', '[', ']'];
+            string[] fieldsarray = fieldsStr.Split(seperator);
+            for (int i = 0; i < fieldsarray.Length - 1; i++)
             {
-                
+
             }
-            string fields = "";
-            int j = InsertCommand.ToLower().IndexOf("(");
-            while (!command[i].ToLower().Equals("values"))
+            string str;
+            
+            while (i > fieldsStr.Length - 1)
             {
-                fields = fields + command[i].Trim();
-                i++;
+                str = fieldsStr.Substring(i, fieldsStr.IndexOf(seperator));
+
+
             }
+            
 
 
-            if (fields.Substring(0,1).Equals("(") && fields.Substring(fields.Length - 1).Equals(")"))
-            {
-                fields = fields.Substring(1, fields.Length - 2);
-            }
-
-            command = fields.Split(',');           
+            string[] command = fields.Split(',');           
             return command;
         }
 
