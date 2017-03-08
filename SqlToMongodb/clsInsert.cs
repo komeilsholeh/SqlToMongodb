@@ -10,17 +10,26 @@ namespace SqlToMongodb
     class clsInsert
     {
         private string seperator = ".^arr.";
-        public string getJsonCommand(string InsertCommand)
+        public ArrayList getJsonCommand(string InsertCommand)
         {
-            string command = "";
-            getValues(InsertCommand);
-            ArrayList fields = getFields(InsertCommand);
-            for (int i = 0; i < fields.Count; i++)
+            ArrayList commandArray = new ArrayList();
+            string[] values= getValues(InsertCommand);
+            string[] fields = getField(InsertCommand);
+            if (values.Length % fields.Length ==0 )
             {
-                command = command + fields[i] + "/";
-            }
-
-            return command;
+                
+                int valueCounter = 0;
+                for(int i=0; i< values.Length / fields.Length;i++)
+                {
+                    string command= "{";
+                    for (int j = 0; j < fields.Length; j++)
+                    {
+                        command = command + "{ \"" + fields[i] + "\" = \"" + values[valueCounter] + "\"}";
+                    }
+                    command = command + "}";
+                }
+            }        
+            return commandArray;
         }
         private string getCollectionName(string InsertCommand)
         {
@@ -76,15 +85,28 @@ namespace SqlToMongodb
 
         }
 
-        private void getValues(string InsertCommand)
+        private string[] getField(string InsertCommand)
+        {
+            int start = InsertCommand.IndexOf("(");
+            int end = InsertCommand.IndexOf(")");
+
+            string fieldsStr = InsertCommand.Substring(start +1 , end - start-1).Trim();
+
+
+            string[] fieldsArray = fieldsStr.Split(',');
+            return fieldsArray;
+        }
+
+        private string[] getValues(string InsertCommand)
         {
             int start = InsertCommand.ToLower().IndexOf("values") + 6;
-            int end = InsertCommand.LastIndexOf(")") + 1;
+            int end = InsertCommand.LastIndexOf(")");
             
             string valuesStr = InsertCommand.Substring(start, end - start).Trim();
-
+            valuesStr = valuesStr.Substring(1, valuesStr.Length - 1);
      
             string[] valuesArray = valuesStr.Split(',');
+            return valuesArray;
         }
     }
 }
