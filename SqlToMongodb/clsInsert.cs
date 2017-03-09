@@ -4,30 +4,69 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
+using MongoDB.Bson;
 
 namespace SqlToMongodb
 {
     class clsInsert
     {
         private string seperator = ".^arr.";
-        public ArrayList getJsonCommand(string InsertCommand)
+
+        public void InsertDocument(string InsertCommand)
+        {
+            MongodbConnection mc = new MongodbConnection();
+            ArrayList mongoCommand = new ArrayList();
+            mongoCommand = getJsonCommand(InsertCommand);
+            for(int i=0; i< mongoCommand.Count; i++)
+            {
+                string te;
+                BsonDocument doc= BsonDocument.Parse(mongoCommand[i].ToString());
+                MongoDB.Bson.BsonDocument document = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(mongoCommand[i].ToString());
+
+                mc.connect();
+                mc.collection.Insert(mongoCommand[i].ToString());
+            }
+        }
+
+        private ArrayList getJsonCommand(string InsertCommand)
         {
             ArrayList commandArray = new ArrayList();
             string[] values= getValues(InsertCommand);
             string[] fields = getField(InsertCommand);
             if (values.Length % fields.Length ==0 )
             {
-                
+                string command="";
                 int valueCounter = 0;
-                for(int i=0; i< values.Length / fields.Length;i++)
+                for(int j=0; j< values.Length / fields.Length;j++)
                 {
-                    string command= "{";
-                    for (int j = 0; j < fields.Length; j++)
+                    command= "";
+                    for (int i = 0; i < fields.Length; i++)
                     {
-                        command = command + "{ \"" + fields[i] + "\" = \"" + values[valueCounter] + "\"}";
+                        if (fields[i].IndexOf('[') ==-1 && fields[i].IndexOf(']') == -1)
+                        {
+                            command = command + "{ \"" + fields[i].Trim() + "\" : \"" + values[valueCounter].Trim() + "\"}";
+                        }else if (fields[i].IndexOf('[') != -1)
+                        {
+                            string arrayName = fields[i].Substring(0, fields[i].IndexOf('[')).Trim();
+                            string fieldName = fields[i].Substring(fields[i].IndexOf('[') + 1).Trim();
+                            command = command + "{ \"" + arrayName + "\" , new BsonArray { new BsonDocument { " 
+                                + "{ \"" + fieldName + "\" , \"" + values[valueCounter].Trim() + "\" }";
+                        }
+                        else if (fields[i].IndexOf(']') != -1)
+                        {
+                            string arrayName = fields[i].Substring(0, fields[i].IndexOf(']') + 1).Trim();
+                            command = command + "{ \"" + fields[i].Trim() + "\" : \"" + values[valueCounter].Trim() + "\"} }}}";
+                        }
+
+                        if (i < fields.Length-1)
+                        {
+                            command = command + ",";
+                        }
+                        valueCounter++;
                     }
-                    command = command + "}";
+                    command = command + "";
                 }
+                commandArray.Add(command);
             }        
             return commandArray;
         }

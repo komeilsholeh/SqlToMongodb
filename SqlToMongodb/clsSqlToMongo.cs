@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace SqlToMongodb
 {
@@ -12,7 +13,7 @@ namespace SqlToMongodb
         //static void Main(string[] args)
         //{
         //    MongodbConnection mc = new MongodbConnection();
-        //    BsonDocument person = new BsonDocument {
+        //BsonDocument person = new BsonDocument {
         //       { "first_name", "Steven"},
         //       { "last_name", "Edouard"},
         //       { "accounts", new BsonArray {
@@ -23,17 +24,18 @@ namespace SqlToMongodb
         //           }
         //       }}
         //   };
-        //    mc.connect();
+        BsonDocument te=new BsonDocument { { "Name", "'komeil'" }, { "family", "'sholeh'" }, { "age", "35" }, { "Contact", new BsonArray { new BsonDocument { { "Tel", "['0753'" }, { "Address]", "'ub8']" } } } }, { "NiNumber", "'sl73'" } };
+        // mc.connect();
         //    mc.collection.Insert(person);
         //    System.Console.WriteLine(person["_id"]);
         //    System.Console.ReadLine();
         //}
 
-        ////
+            ////
         public string commandConvertor(string SQLcommand)
         {
             string[] command =SQLcommand.Split(' ');
-            string mongoCommand="";
+            ArrayList mongoCommand = new ArrayList();
             switch (command[0].ToLower())
             {
                 case "select":
@@ -41,8 +43,7 @@ namespace SqlToMongodb
                     break;
                 case "insert":
                     clsInsert ci = new clsInsert();
-                    mongoCommand = ci.getJsonCommand(SQLcommand);
-                    
+                    ci.InsertDocument(SQLcommand);                    
                     break;
                 case "update":
 
@@ -52,7 +53,7 @@ namespace SqlToMongodb
                 default:
                     break;
             }
-            return mongoCommand; 
+            return mongoCommand[0].ToString(); 
         }
 
 
