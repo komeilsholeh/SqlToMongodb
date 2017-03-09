@@ -20,11 +20,11 @@ namespace SqlToMongodb
             for(int i=0; i< mongoCommand.Count; i++)
             {
                 string te;
-                BsonDocument doc= BsonDocument.Parse(mongoCommand[i].ToString());
+              //  BsonDocument doc= BsonDocument.Parse(mongoCommand[i].ToString());
                 MongoDB.Bson.BsonDocument document = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(mongoCommand[i].ToString());
 
                 mc.connect();
-                mc.collection.Insert(mongoCommand[i].ToString());
+                mc.collection.Insert(document);
             }
         }
 
@@ -39,23 +39,23 @@ namespace SqlToMongodb
                 int valueCounter = 0;
                 for(int j=0; j< values.Length / fields.Length;j++)
                 {
-                    command= "";
+                    command= "{";
                     for (int i = 0; i < fields.Length; i++)
                     {
                         if (fields[i].IndexOf('[') ==-1 && fields[i].IndexOf(']') == -1)
                         {
-                            command = command + "{ \"" + fields[i].Trim() + "\" : \"" + values[valueCounter].Trim() + "\"}";
+                            command = command + " \"" + fields[i].Trim() + "\" : \"" + values[valueCounter].Trim() + "\"";
                         }else if (fields[i].IndexOf('[') != -1)
                         {
                             string arrayName = fields[i].Substring(0, fields[i].IndexOf('[')).Trim();
                             string fieldName = fields[i].Substring(fields[i].IndexOf('[') + 1).Trim();
-                            command = command + "{ \"" + arrayName + "\" , new BsonArray { new BsonDocument { " 
-                                + "{ \"" + fieldName + "\" , \"" + values[valueCounter].Trim() + "\" }";
+                            command = command + " \"" + arrayName + "\" : [{ " 
+                                + "\"" + fieldName + "\" : \"" + values[valueCounter].Trim() + "\" ";
                         }
                         else if (fields[i].IndexOf(']') != -1)
                         {
-                            string arrayName = fields[i].Substring(0, fields[i].IndexOf(']') + 1).Trim();
-                            command = command + "{ \"" + fields[i].Trim() + "\" : \"" + values[valueCounter].Trim() + "\"} }}}";
+                            string fieldName = fields[i].Substring(0, fields[i].IndexOf(']')).Trim();
+                            command = command + " \"" + fieldName + "\" : \"" + values[valueCounter].Trim() + "\" }]";
                         }
 
                         if (i < fields.Length-1)
@@ -64,7 +64,7 @@ namespace SqlToMongodb
                         }
                         valueCounter++;
                     }
-                    command = command + "";
+                    command = command + "}";
                 }
                 commandArray.Add(command);
             }        
