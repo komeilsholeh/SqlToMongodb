@@ -10,32 +10,11 @@ namespace SqlToMongodb
 {
     public class clsSqlToMongo
     {
-        //static void Main(string[] args)
-        //{
-        //    MongodbConnection mc = new MongodbConnection();
-        //BsonDocument person = new BsonDocument {
-        //       { "first_name", "Steven"},
-        //       { "last_name", "Edouard"},
-        //       { "accounts", new BsonArray {
-        //           new BsonDocument {
-        //               { "account_balance", 50000000},
-        //               { "account_type", "Investment"},
-        //               { "currency", "USD"}
-        //           }
-        //       }}
-        //   };
-        BsonDocument te=new BsonDocument { { "Name", "'komeil'" }, { "family", "'sholeh'" }, { "age", "35" }, { "Contact", new BsonArray { new BsonDocument { { "Tel", "['0753'" }, { "Address]", "'ub8']" } } } }, { "NiNumber", "'sl73'" } };
-        // mc.connect();
-        //    mc.collection.Insert(person);
-        //    System.Console.WriteLine(person["_id"]);
-        //    System.Console.ReadLine();
-        //}
-
-            ////
+       
         public string commandConvertor(string SQLcommand)
         {
             string[] command =SQLcommand.Split(' ');
-            ArrayList mongoCommand = new ArrayList();
+            string mongoCommand = "";
             switch (command[0].ToLower())
             {
                 case "select":
@@ -43,7 +22,7 @@ namespace SqlToMongodb
                     break;
                 case "insert":
                     clsInsert ci = new clsInsert();
-                    ci.InsertDocument(SQLcommand);                    
+                    mongoCommand= ci.InsertDocument(SQLcommand);                    
                     break;
                 case "update":
 
@@ -53,7 +32,7 @@ namespace SqlToMongodb
                 default:
                     break;
             }
-            return mongoCommand[0].ToString(); 
+            return mongoCommand; 
         }
 
 

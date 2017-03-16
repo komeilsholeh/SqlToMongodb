@@ -11,19 +11,19 @@ namespace SqlToMongodb
     class clsInsert
     {
        
-        public void InsertDocument(string InsertCommand)
+        public string InsertDocument(string InsertCommand)
         {
             //setValuesFields(InsertCommand);
             MongodbConnection mc = new MongodbConnection();
             string mongoCommand = setValuesFields(InsertCommand);
-            
-                
-              //  BsonDocument doc= BsonDocument.Parse(mongoCommand[i].ToString());
-                MongoDB.Bson.BsonDocument document = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(mongoCommand);
 
-                mc.connect();
-                mc.collection.Insert(document);
-            
+
+            ////  BsonDocument doc= BsonDocument.Parse(mongoCommand[i].ToString());
+              MongoDB.Bson.BsonDocument document = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(mongoCommand);
+
+              mc.connect();
+              mc.collection.Insert(document);
+            return mongoCommand;
         }
 
         private string getJsonCommand(string InsertCommand)
@@ -92,7 +92,7 @@ namespace SqlToMongodb
                 // getting fields
                 if(fields[i].IndexOfAny(seperators) == -1)
                 {
-                    command += "\"" + fields[i] + "\" : \"" + values[cnt] + "\"";
+                    command += "\"" + getString(fields[i]) + "\" : \"" + getString(values[cnt]) + "\"";
                     cnt++;
                 }
 
@@ -103,7 +103,7 @@ namespace SqlToMongodb
                     do
                     {
                         if (command.EndsWith("[") == false) command += ",";
-                        value = values[cnt].Replace("[", "").Replace("]", "").Trim();
+                        value = getString(values[cnt]);
                         command += " \"" + value + "\"";
                         cnt++;
                     } while (values[cnt-1].IndexOf(']') == -1);
@@ -114,19 +114,19 @@ namespace SqlToMongodb
                 if (fields[i].IndexOf('[') != -1 && fields[i].IndexOf('(') != -1)
                 {
                     command += "\"" + fields[i].Substring(0, fields[i].Trim().IndexOf('[')) + "\" : [";
-                    docFields.Add(fields[i].Substring(fields[i].IndexOf('(')).Replace(")",""));
+                    docFields.Add(getString(fields[i].Substring(fields[i].IndexOf('(')).Replace(")","")));
                     while (fields[i].IndexOf(')') == -1)
                     {
                         i++;
-                        docFields.Add(fields[i]);
+                        docFields.Add(getString(fields[i]));
                     }
                     while (values[cnt-1].IndexOf(']')==-1 && cnt <= values.Length)
                     {
-                        if (command.EndsWith("}") == false) command += ",";
+                        if (command.EndsWith("}") == true) command += ",";
                         command += "{";
                         for(int j = 0; j < docFields.Count; j++)
                         {
-                            command+= " \"" + docFields[j].ToString() + "\" : \"" + values[cnt] + "\"";
+                            command+= " \"" + docFields[j].ToString() + "\" : \"" + getString(values[cnt]) + "\"";
                             cnt++;
 
                             if (j < docFields.Count - 1)
@@ -143,12 +143,12 @@ namespace SqlToMongodb
                 if (fields[i].IndexOf('[') == -1 && fields[i].IndexOf('(') != -1)
                 {
                     command += "\"" + fields[i].Substring(0, fields[i].Trim().IndexOf('(')) + "\" : { \""
-                        + fields[i].Substring(fields[i].IndexOf('(') +1) + "\" : " + "\"" + values[cnt].Substring(1) + "\"";
+                        + fields[i].Substring(fields[i].IndexOf('(') +1) + "\" : " + "\"" + getString(values[cnt]) + "\"";
                     cnt++;
                 }
                 if (fields[i].Trim().EndsWith(")"))
                 {
-                    command += "\"" + fields[i].Substring(0,fields[i].Length-1) + "\" : \"" + values[cnt].Substring(0,values[cnt].Length-1) + "\" }";
+                    command += "\"" + fields[i].Substring(0,fields[i].Length-1) + "\" : \"" + getString(values[cnt]) + "\" }";
                     cnt++;
                 }
 
@@ -160,6 +160,18 @@ namespace SqlToMongodb
 
             command = command + "}";
             return command;
+        }
+
+        private string getString(string value)
+        {
+            value = value.Trim();
+            if (value.StartsWith("[(") == true) value = value.Substring(2);
+            if (value.EndsWith(")]") == true) value = value.Substring(0,value.Length-2);
+            if (value.StartsWith("[") == true) value = value.Substring(1);
+            if (value.StartsWith("(") == true) value = value.Substring(1);
+            if (value.EndsWith(")") == true) value = value.Substring(0, value.Length - 1);
+            if (value.EndsWith("]") == true) value = value.Substring(0, value.Length - 1);
+            return value;
         }
 
 
