@@ -40,7 +40,7 @@
             this.textBox1.Size = new System.Drawing.Size(738, 20);
             this.textBox1.TabIndex = 0;
             this.textBox1.Text = "INSERT INTO MyDoc (Name(firstName,nickName),family, age, Contact[(Tel,Address)],N" +
-    "iNumber[]) Values ((komeil,komi),sholeh,35,([0753,ub8],[795,ub7]), [sl73,su12])";
+    "iNumber[]) Values ((komeil,komi),sholeh,35,[(0753,ub8),(795,ub7)], [sl73,su12])";
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // button1

@@ -13,8 +13,9 @@ namespace SqlToMongodb
        
         public void InsertDocument(string InsertCommand)
         {
+            //setValuesFields(InsertCommand);
             MongodbConnection mc = new MongodbConnection();
-            string mongoCommand = getJsonCommand(InsertCommand);
+            string mongoCommand = setValuesFields(InsertCommand);
             
                 
               //  BsonDocument doc= BsonDocument.Parse(mongoCommand[i].ToString());
@@ -31,7 +32,8 @@ namespace SqlToMongodb
             string[] fields = getFields(InsertCommand);
             string command = "";
             int valueCounter = 0;
-            char[] seperators =['[', ']', '(', ')'];
+            char[] seperators = { '[', ']', '(', ')' };
+
             command= "{";
             for (int i = 0; i < fields.Length; i++)
             {
@@ -63,6 +65,104 @@ namespace SqlToMongodb
                     
             return command;
         }
+
+        public string setValuesFields(string InsertCommand)
+        {
+            string[] values = getValues(InsertCommand);
+            string[] fields = getFields(InsertCommand);
+
+            int start = InsertCommand.IndexOf("(") + 1;
+            int end = InsertCommand.ToLower().IndexOf("values") - 1;
+            string fieldsStr = InsertCommand.Trim().Substring(start, end - start - 1).Trim();
+
+            start = InsertCommand.ToLower().IndexOf("values") + 6;
+            end = InsertCommand.LastIndexOf(")");
+            string valuesStr = InsertCommand.Substring(start, end - start).Trim();
+            valuesStr = valuesStr.Substring(1, valuesStr.Length - 1);
+
+            ArrayList docFields = new ArrayList();
+
+            string command = "{";
+            int cnt = 0;
+            char[] seperators = { '[', ']', '(', ')' };
+            string value;
+            for (int i = 0; i < fields.Length; i++)
+            {
+
+                // getting fields
+                if(fields[i].IndexOfAny(seperators) == -1)
+                {
+                    command += "\"" + fields[i] + "\" : \"" + values[cnt] + "\"";
+                    cnt++;
+                }
+
+                // getting arrays
+                if (fields[i].Trim().EndsWith("[]") == true)
+                {
+                    command += "\"" + fields[i].Substring(0,fields[i].Trim().IndexOf('[')) + "\" : [";
+                    do
+                    {
+                        if (command.EndsWith("[") == false) command += ",";
+                        value = values[cnt].Replace("[", "").Replace("]", "").Trim();
+                        command += " \"" + value + "\"";
+                        cnt++;
+                    } while (values[cnt-1].IndexOf(']') == -1);
+                    command += " ]";
+                }
+
+                // getting document arrays 
+                if (fields[i].IndexOf('[') != -1 && fields[i].IndexOf('(') != -1)
+                {
+                    command += "\"" + fields[i].Substring(0, fields[i].Trim().IndexOf('[')) + "\" : [";
+                    docFields.Add(fields[i].Substring(fields[i].IndexOf('(')).Replace(")",""));
+                    while (fields[i].IndexOf(')') == -1)
+                    {
+                        i++;
+                        docFields.Add(fields[i]);
+                    }
+                    while (values[cnt-1].IndexOf(']')==-1 && cnt <= values.Length)
+                    {
+                        if (command.EndsWith("}") == false) command += ",";
+                        command += "{";
+                        for(int j = 0; j < docFields.Count; j++)
+                        {
+                            command+= " \"" + docFields[j].ToString() + "\" : \"" + values[cnt] + "\"";
+                            cnt++;
+
+                            if (j < docFields.Count - 1)
+                            {
+                                command = command + ",";
+                            }
+                        }
+                        command += "}";
+                    }
+                    command += "]";
+                }
+
+                // getting subdocuments
+                if (fields[i].IndexOf('[') == -1 && fields[i].IndexOf('(') != -1)
+                {
+                    command += "\"" + fields[i].Substring(0, fields[i].Trim().IndexOf('(')) + "\" : { \""
+                        + fields[i].Substring(fields[i].IndexOf('(') +1) + "\" : " + "\"" + values[cnt].Substring(1) + "\"";
+                    cnt++;
+                }
+                if (fields[i].Trim().EndsWith(")"))
+                {
+                    command += "\"" + fields[i].Substring(0,fields[i].Length-1) + "\" : \"" + values[cnt].Substring(0,values[cnt].Length-1) + "\" }";
+                    cnt++;
+                }
+
+                if (i < fields.Length - 1)
+                {
+                    command = command + ",";
+                }
+        }
+
+            command = command + "}";
+            return command;
+        }
+
+
         private string getCollectionName(string InsertCommand)
         {
              return InsertCommand.Substring(11, InsertCommand.IndexOf("(")-11).Trim();
