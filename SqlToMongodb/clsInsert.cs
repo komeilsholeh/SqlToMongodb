@@ -11,7 +11,7 @@ namespace SqlToMongodb
     class clsInsert
     {
        
-        public void InsertDocument(string InsertCommand)
+        public string InsertDocument(string InsertCommand)
         {
             MongodbConnection mc = new MongodbConnection();
             string mongoCommand = getJsonCommand(InsertCommand);
@@ -22,16 +22,16 @@ namespace SqlToMongodb
 
                 mc.connect();
                 mc.collection.Insert(document);
-            
+            return mongoCommand;   
         }
 
         private string getJsonCommand(string InsertCommand)
-        {         
-            string[] values= getValues(InsertCommand);
+        {
+            string[] values = getValues(InsertCommand);
             string[] fields = getFields(InsertCommand);
             string command = "";
             int valueCounter = 0;
-            char[] seperators =['[', ']', '(', ')'];
+            char[] seperators = { '[', ']', '(', ')'};
             command= "{";
             for (int i = 0; i < fields.Length; i++)
             {

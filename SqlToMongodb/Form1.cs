@@ -22,10 +22,5 @@ namespace SqlToMongodb
             clsSqlToMongo csm = new clsSqlToMongo();
             textBox2.Text = csm.commandConvertor(textBox1.Text);
         }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }

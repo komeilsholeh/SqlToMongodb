@@ -13,7 +13,6 @@ namespace SqlToMongodb
     
     class MongodbConnection
     {
-
         private static MongoClient client;
         private static MongoServer server;
         private static MongoDatabase dataBase;
@@ -21,25 +20,21 @@ namespace SqlToMongodb
         public void connect()
         {
             try
-            {
+            {   // check if connection is open
                 server.Ping();
-                Console.WriteLine("Connected"); 
             }
             catch 
-            {
-                Console.WriteLine("Failed");
+            {   // making connection to database
                 client = new MongoClient("mongodb://127.0.0.1:27017");
                 server = client.GetServer();
                 dataBase = server.GetDatabase("local");
-                collection = dataBase.GetCollection<BsonDocument>("komeiltest");
+                collection = dataBase.GetCollection<BsonDocument>("CollectionName");
             }            
         }
-
         public void createCollection(String databaseName)
-        {
+        {   // creating a collection in database
             CollectionOptionsBuilder options = CollectionOptions.SetCapped(true);
             dataBase.CreateCollection(databaseName, options);
         }
-
     }
 }
