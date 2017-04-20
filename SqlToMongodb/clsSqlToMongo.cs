@@ -18,19 +18,26 @@ namespace SqlToMongodb
             {
                 case "select":
                     // calling related class and method;
+                    clsSelect sel = new clsSelect();
+                    mongoCommand = sel.SelectDocument(SQLcommand);
                     break;
                 case "insert":
                     // calling related class and method;
-                    clsInsert ci = new clsInsert();
-                    mongoCommand= ci.InsertDocument(SQLcommand);                    
+                    clsInsert ins = new clsInsert();
+                    mongoCommand= ins.InsertDocument(SQLcommand);                    
                     break;
                 case "update":
                     // calling related class and method;
+                    clsUpdate upd = new clsUpdate();
+                    mongoCommand = upd.UpdateDocument(SQLcommand);
                     break;
                 case "delete":
                     // calling related class and method;
+                    clsDelete del = new clsDelete();
+                    mongoCommand = del.DeleteDocument(SQLcommand);
                     break;
                 default:
+                    mongoCommand = "syntax error";
                     break;
             }
             return mongoCommand; 

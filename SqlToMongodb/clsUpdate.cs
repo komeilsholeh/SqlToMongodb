@@ -8,5 +8,10 @@ namespace SqlToMongodb
 {
     class clsUpdate
     {
+        public string UpdateDocument(string InsertCommand)
+        {
+            string mongoCommand = "";
+            return mongoCommand;
+        }
     }
 }

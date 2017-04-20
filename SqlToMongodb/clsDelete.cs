@@ -8,5 +8,10 @@ namespace SqlToMongodb
 {
     class clsDelete
     {
+        public string DeleteDocument(string InsertCommand)
+        {
+            string mongoCommand = "";
+            return mongoCommand;
+        }
     }
 }
