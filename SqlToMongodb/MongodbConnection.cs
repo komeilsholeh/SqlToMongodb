@@ -18,18 +18,12 @@ namespace SqlToMongodb
         private static MongoDatabase dataBase;
         public MongoCollection<BsonDocument> collection;
         public void connect()
-        {
-            try
-            {   // check if connection is open
-                server.Ping();
-            }
-            catch 
-            {   // making connection to database
-                client = new MongoClient("mongodb://127.0.0.1:27017");
-                server = client.GetServer();
-                dataBase = server.GetDatabase("local");
-                collection = dataBase.GetCollection<BsonDocument>("myCollection");
-            }            
+        {            
+            // making connection to database
+            client = new MongoClient("mongodb://127.0.0.1:27017");
+            server = client.GetServer();
+            dataBase = server.GetDatabase("local");
+            collection = dataBase.GetCollection<BsonDocument>("myCollection");                        
         }
         public void createCollection(String databaseName)
         {   // creating a collection in database
