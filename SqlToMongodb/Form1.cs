@@ -21,6 +21,7 @@ namespace SqlToMongodb
         {
             clsSqlToMongo csm = new clsSqlToMongo();
             textBox2.Text = csm.commandConvertor(textBox1.Text);
+            MessageBox.Show("new document added to database"); 
         }
     }
 }

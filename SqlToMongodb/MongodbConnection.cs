@@ -28,7 +28,7 @@ namespace SqlToMongodb
                 client = new MongoClient("mongodb://127.0.0.1:27017");
                 server = client.GetServer();
                 dataBase = server.GetDatabase("local");
-                collection = dataBase.GetCollection<BsonDocument>("CollectionName");
+                collection = dataBase.GetCollection<BsonDocument>("myCollection");
             }            
         }
         public void createCollection(String databaseName)
